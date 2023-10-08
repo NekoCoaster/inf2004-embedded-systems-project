@@ -8,7 +8,9 @@ Here in this folder, contains all the nessasary documentation on how we plan to 
 - Noctua NF-A4x10 5V, 4-pin PWM Fan (40mm x 10mm)
 - Jumper Wires
 - Breadboard (optional)
-- Power Supply (5V) for both the Fan and Raspberry Pi Pico
+- USB Type A breakout (As Power Supply)
+- 1 * 1k ohm resistor
+- 2 * 1N4148 diodes
 
 ## 4-pin PWM Fan Header Pinout and wiring proposal.
 
