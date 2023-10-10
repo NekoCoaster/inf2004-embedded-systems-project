@@ -38,7 +38,7 @@ For our use case, we will be assuming that the whole system will be running off 
 **PWM Signal Pin:** Blue wire </br>
 For our PWM signal pin, we will be using GP2, which is the 4th pin from the top left of the Raspberry Pi Pico. </br>
 While the GPIO pins on the Raspberry Pi Pico are capable of supplying up to 16mA of current, the Fan's PWM input signal pin is only rated to handle up to 5mA. And as such, we will be using a 1k ohm resistor to bring down the current to 3.3mA which is well within the fan's PWM input pin's current rating.</br>
-In addition to the 1k ohm resistor, we will also be using a 1N4148 diode to protect the GPIO pin from any voltage spikes that may occur when the fan is turned on. </br>
+In addition to the 1k ohm resistor, we will also be using a 1N4148 diode to protect the GPIO pin from any back-flow voltage from the 5V fan </br>
 
 ### Connecting the Tachometer signal pin
 **GPIO Pin:** GP15 </br>
@@ -49,4 +49,4 @@ The Tachometer signal pin is an open-collector output, which means that it will 
 However, a resistor is not required as the Tachometer signal pin is rated to handle up to 5mA of current, whereas the internal pull-up resistor has an impedance of 50k ohms, this would mean that the current flowing through the Tachometer signal pin would be 3.3V / 50k ohms = 0.066mA, which is well within the Tachometer signal pin's current rating. </br>
 ⚠️ **HOWEVER**, Noctua recommends that the voltage on the Tachometer signal should be around 5V, there may be some issues with using 3.3V as the signal voltage on the Tachometer signal pin. There should be no damages done to both the Raspberry Pi Pico and the fan, but the Tachometer signal may not be as accurate as it should be at best, or not work at all at worst. </br>
 More investigation and testing will be required to determine if the Tachometer signal pin will work with 3.3V as the signal voltage. </br>
-As for the diode, while it is not required as the Tachometer signal pin is an open-collector output, for insurance, we will be using a 1N4148 diode to protect the GPIO pin from feedback voltage from the fan.</br>
+As for the diode, while it is not required as the Tachometer signal pin is an open-collector output, for insurance, we will be using a 1N4148 diode to protect the GPIO pin from back-flow voltage from the fan.</br>
