@@ -1,0 +1,8 @@
+# Ignore the entire build folder
+/drivers/build/
+
+# Ignore files ending with _credentials.h, _creds.h, _secrets.h, _secret.h
+*_credentials.h
+*_creds.h
+*_secrets.h
+*_secret.h
