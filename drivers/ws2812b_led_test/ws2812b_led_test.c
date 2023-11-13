@@ -152,7 +152,7 @@ int main()
     gpio_put(LED_PIN, false); /* Important to start low to tell the LEDs that it's time for new data */
 
     /* 100MHz is a clean number and used to calculate the cycle delays */
-    set_sys_clock_khz(100000, true);
+    // set_sys_clock_khz(100000, true);
 
     /* Wait a bit to ensure clock is running and force LEDs to reset*/
     sleep_ms(10);
@@ -163,7 +163,7 @@ int main()
     uint8_t dim_value = 1;
     uint8_t dim_dir = 1;
 
-    uint32_t timer = 100;   /* Change LEDs every 2ms, basically a speed control, higher is slower */
+    uint32_t timer = 50;    /* Change LEDs every 2ms, basically a speed control, higher is slower */
     uint32_t timer_val = 0; /* Track current time */
     while (true)
     {
@@ -190,7 +190,7 @@ int main()
                 dim_value--;
 
             /* Set LED data to dimmed white */
-            set_all(dim_value, dim_value, dim_value);
+            set_all(dim_value, 0, dim_value);
 
             /*---------------------------------------------------------------------*/
 
@@ -208,7 +208,7 @@ int main()
             }
 
             /* Set new position */
-            set_led(led, 100, 0, 0); /* Red */
+            set_led(led, 0, 100, 100); /* Red */
 
             /* Move LED for next iteration */
             if (led_dir)
