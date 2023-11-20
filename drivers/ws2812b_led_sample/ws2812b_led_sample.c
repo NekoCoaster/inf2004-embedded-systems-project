@@ -1,18 +1,10 @@
-// WS2812B LED test code by yeahimthatguy @ https://forums.raspberrypi.com/viewtopic.php?t=322218
-
 /* Libraries */
 #include "pico/stdlib.h"
 
 /* For WS2812B */
 /* Datasheet used: https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf */
 
-/* WARNING: Due to WS2812B being 5V logic and the RP2040 being 3v3 a level shifter is needed */
-/* You will not fry the pins or anything if you accidentally hook it up, it just won't register */
-/* This is because WS2812B registers 0.7VDD as a minimum for logic high, 0.7*5V => 3.5V which is above what the RP2040 can do */
-
 /* Assembler functions */
-/* If you place this in a .cpp file make sure to change /extern/ to /extern "C"/ */
-/* eg; extern "C" void function(); */
 extern void cycle_delay_t0h();
 extern void cycle_delay_t0l();
 extern void cycle_delay_t1h();
@@ -25,18 +17,18 @@ extern void enable_and_restore_interrupts(uint32_t); /* Used for interrupt enabl
 
 /* Number of individual LEDs */
 /* You can have up to 80,000 LEDs before you run out of memory */
-#define LED_NUM 8
+#define LED_NUM 1
 
 /* Leave alone, only defined to hammer it into the compilers head */
 #define LED_DATA_SIZE 3
 #define LED_BYTE_SIZE LED_NUM *LED_DATA_SIZE
 
-/* We are not here to waste any memory, 3 bytes per LED */
+/* 3 bytes per LED */
 uint8_t led_data[LED_BYTE_SIZE];
 
 /* Sets a specific LED to a certain color */
 /* LEDs start at 0 */
-void set_led(uint32_t led, uint8_t r, uint8_t g, uint8_t b)
+void rgb_led_set_one(uint32_t led, uint8_t r, uint8_t g, uint8_t b)
 {
     led_data[led * LED_DATA_SIZE] = g;       /* Green */
     led_data[(led * LED_DATA_SIZE) + 1] = r; /* Red */
@@ -44,7 +36,7 @@ void set_led(uint32_t led, uint8_t r, uint8_t g, uint8_t b)
 }
 
 /* Sets all the LEDs to a certain color */
-void set_all(uint8_t r, uint8_t g, uint8_t b)
+void rgb_led_set_all(uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint32_t i = 0; i < LED_BYTE_SIZE; i += LED_DATA_SIZE)
     {
@@ -55,7 +47,7 @@ void set_all(uint8_t r, uint8_t g, uint8_t b)
 }
 
 /* Sends the data to the LEDs */
-void send_led_data()
+void rgb_led_show()
 {
     /* Disable all interrupts and save the mask */
     uint32_t interrupt_mask = disable_and_save_interrupts();
@@ -72,9 +64,7 @@ void send_led_data()
 
     for (i = 0; i < LED_BYTE_SIZE; i += LED_DATA_SIZE)
     {
-        /* Send order is green, red, blue because someone messed up big time */
-
-        /* Look up values once, a micro optimization, assume compiler is dumb as a brick */
+        /* Send order is green, red, blue  */
         green = led_data[i];
         red = led_data[i + 1];
         blue = led_data[i + 2];
@@ -144,98 +134,46 @@ void send_led_data()
     /* Make sure to wait any amount of time after you call this function */
 }
 
-void led_begin()
-{ /* System init */
+void rgb_led_begin()
+{
+    /* Set the pin to output */
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, false); /* Important to start low to tell the LEDs that it's time for new data */
-
-    /* 100MHz is a clean number and used to calculate the cycle delays */
-    // set_sys_clock_khz(100000, true);
-
-    /* Wait a bit to ensure clock is running and force LEDs to reset*/
+    /*Wait a bit to force LEDs to reset*/
     sleep_ms(10);
 }
 
 int main()
 {
-    led_begin();
+    stdio_init_all();
+    printf("WS2812B LED Sample\n");
 
-    /* Used for example */
-    int32_t led = 0;
-    uint8_t led_dir = 1;
-    uint8_t dim_value = 1;
-    uint8_t dim_dir = 1;
+    rgb_led_begin();
 
-    uint32_t timer = 50;    /* Change LEDs every 2ms, basically a speed control, higher is slower */
-    uint32_t timer_val = 0; /* Track current time */
     while (true)
     {
-        /* Go crazy */
-
-        /* Only need to update LEDs once every 2ms */
-        if (timer_val > timer)
-        {
-            /*-- I'm using this to dim the LEDs on and off with the color white --*/
-
-            if (dim_value >= 26) /* Start dimming down */
-            {
-                dim_value = 25;
-                dim_dir = 0;
-            }
-            else if (dim_value == 0) /* Start dimming up */
-            {
-                dim_dir = 1;
-            }
-
-            if (dim_dir)
-                dim_value++;
-            else
-                dim_value--;
-
-            /* Set LED data to dimmed white */
-            set_all(dim_value, 0, dim_value);
-
-            /*---------------------------------------------------------------------*/
-
-            /*-- I'm using this to race a red LED back and forth across the strip --*/
-
-            if (led < 0) /* Reached end, go back */
-            {
-                led = 0;
-                led_dir = 1;
-            }
-            else if (led >= LED_NUM - 1) /* Reached other end, go back */
-            {
-                led = LED_NUM - 1;
-                led_dir = 0;
-            }
-
-            /* Set new position */
-            set_led(led, 0, 10, 10); /* Red */
-
-            /* Move LED for next iteration */
-            if (led_dir)
-                led++;
-            else
-                led--;
-
-            /*-----------------------------------------------------------------------*/
-
-            timer_val = 0; /* Reset update cycle */
-        }
-
-        /* Send out the color data to the LEDs */
-        send_led_data();
-
-        /* Refresh rate for LEDs*/
-        /* It is hard to estimate due to the logic above consuming time, but forcing it at 1ms + roughly 2.5ms from LED data transfer + 0.5ms logic above => 4ms per loop */
-        /* Which is roughly 250Hz, but again this is a hard guess, it's probably even less */
-        /* Also note that this is different from the update rate which is how fast you are updating your LED colors in code */
-        sleep_ms(1);
-        timer_val++;
-
-        /* A wait is important like the sleep_ms() above. This is to give the LEDs a notice of reset. It expects anything more than 50us */
+        rgb_led_set_all(255, 0, 0); /* Red */
+        rgb_led_show();
+        sleep_ms(1000);
+        rgb_led_set_all(255, 255, 0); /* Yellow */
+        rgb_led_show();
+        sleep_ms(1000);
+        rgb_led_set_all(0, 255, 0); /* Green */
+        rgb_led_show();
+        sleep_ms(1000);
+        rgb_led_set_all(0, 255, 255); /* Cyan */
+        rgb_led_show();
+        sleep_ms(1000);
+        rgb_led_set_all(0, 0, 255); /* Blue */
+        rgb_led_show();
+        sleep_ms(1000);
+        rgb_led_set_all(255, 0, 255); /* Magenta */
+        rgb_led_show();
+        sleep_ms(1000);
+        rgb_led_set_all(255, 255, 255); /* White */
+        rgb_led_show();
+        sleep_ms(1000);
     }
 
     return 0;

@@ -26,6 +26,14 @@
   "files.associations": {
     "*.embeddedhtml": "html",
     "mqttclient.h": "c",
-    "string.h": "c"
-  }
+    "string.h": "c",
+    "stdio.h": "c",
+    "i2c.h": "c",
+    "chrono": "c",
+    "cmath": "c",
+    "numeric": "cpp",
+    "random": "cpp",
+    "gpio.h": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }
