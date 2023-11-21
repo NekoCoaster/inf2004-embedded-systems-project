@@ -65,7 +65,7 @@ void i2c_tools_init(i2c_inst_t *i2c, int sda, int scl)
     _buffLen = 0;
 }
 
-bool setSDA(int pin)
+bool i2c_tools_setSDA(int pin)
 {
     if ((!_running))
     {
@@ -89,7 +89,7 @@ bool setSDA(int pin)
     return false;
 }
 
-bool setSCL(int pin)
+bool i2c_tools_setSCL(int pin)
 {
     if ((!_running))
     {
@@ -113,7 +113,7 @@ bool setSCL(int pin)
     return false;
 }
 
-void setClock(uint32_t hz)
+void i2c_tools_setClock(uint32_t hz)
 {
     _clkHz = hz;
     if (_running)
@@ -122,7 +122,7 @@ void setClock(uint32_t hz)
     }
 }
 
-void begin()
+void i2c_tools_begin()
 {
     if (_running)
     {
@@ -142,7 +142,7 @@ void begin()
     _buffLen = 0;
 }
 
-void end()
+void i2c_tools_end()
 {
     if (!_running)
     {
@@ -158,7 +158,7 @@ void end()
     _txBegun = false;
 }
 
-void beginTransmission(uint8_t addr)
+void i2c_tools_beginTransmission(uint8_t addr)
 {
     if (!_running || _txBegun)
     {
@@ -171,7 +171,7 @@ void beginTransmission(uint8_t addr)
     _txBegun = true;
 }
 
-size_t requestFrom_w_stopbit(uint8_t address, size_t quantity, bool stopBit)
+size_t i2c_tools_requestFrom_w_stopbit(uint8_t address, size_t quantity, bool stopBit)
 {
     if (!_running || _txBegun || !quantity || (quantity > sizeof(_buff)))
     {
@@ -187,9 +187,9 @@ size_t requestFrom_w_stopbit(uint8_t address, size_t quantity, bool stopBit)
     return _buffLen;
 }
 
-size_t requestFrom(uint8_t address, size_t quantity)
+size_t i2c_tools_requestFrom(uint8_t address, size_t quantity)
 {
-    return requestFrom_w_stopbit(address, quantity, true);
+    return i2c_tools_requestFrom_w_stopbit(address, quantity, true);
 }
 
 static bool _clockStretch(int pin)
@@ -269,7 +269,7 @@ stop:
 //  2 : NACK on transmit of address
 //  3 : NACK on transmit of data
 //  4 : Other error
-uint8_t endTransmission_w_stopbit(bool stopBit)
+uint8_t i2c_tools_endTransmission_w_stopbit(bool stopBit)
 {
     if (!_running || !_txBegun)
     {
@@ -290,12 +290,12 @@ uint8_t endTransmission_w_stopbit(bool stopBit)
     }
 }
 
-uint8_t endTransmission()
+uint8_t i2c_tools_endTransmission()
 {
-    return endTransmission_w_stopbit(true);
+    return i2c_tools_endTransmission_w_stopbit(true);
 }
 
-size_t write(uint8_t ucData)
+size_t i2c_tools_write(uint8_t ucData)
 {
     if (!_running)
     {
@@ -322,7 +322,7 @@ size_t write(uint8_t ucData)
     }
 }
 
-size_t write_w_quantity(const uint8_t *data, size_t quantity)
+size_t i2c_tools_write_w_quantity(const uint8_t *data, size_t quantity)
 {
     for (size_t i = 0; i < quantity; ++i)
     {
@@ -335,30 +335,30 @@ size_t write_w_quantity(const uint8_t *data, size_t quantity)
     return quantity;
 }
 
-int available(void)
+int i2c_tools_available(void)
 {
     return _running ? _buffLen - _buffOff : 0;
 }
 
-int read(void)
+int i2c_tools_read(void)
 {
-    if (available())
+    if (i2c_tools_available())
     {
         return _buff[_buffOff++];
     }
     return -1; // EOF
 }
 
-int peek(void)
+int i2c_tools_peek(void)
 {
-    if (available())
+    if (i2c_tools_available())
     {
         return _buff[_buffOff];
     }
     return -1; // EOF
 }
 
-void flush(void)
+void i2c_tools_flush(void)
 {
     // Do nothing, use endTransmission(..) to force
     // data transfer.
