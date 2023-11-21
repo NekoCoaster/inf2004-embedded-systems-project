@@ -21,47 +21,47 @@ void pinMode(int pin, int mode);
 void i2c_tools_init(i2c_inst_t *i2c, int sda, int scl);
 
 // Start as Master
-void begin();
+void i2c_tools_begin();
 // Shut down the I2C interface
-void end();
+void i2c_tools_end();
 
 // Select IO pins to use.  Call before ::begin()
-bool setSDA(int sda);
-bool setSCL(int scl);
+bool i2c_tools_setSDA(int sda);
+bool i2c_tools_setSCL(int scl);
 
-void setClock(uint32_t freqHz);
+void i2c_tools_etClock(uint32_t freqHz);
 
-void beginTransmission(uint8_t);
-uint8_t endTransmission_w_stopbit(bool stopBit);
-uint8_t endTransmission(void);
+void i2c_tools_beginTransmission(uint8_t);
+uint8_t i2c_tools_endTransmission_w_stopbit(bool stopBit);
+uint8_t i2c_tools_endTransmission(void);
 
-size_t requestFrom_w_stopbit(uint8_t address, size_t quantity, bool stopBit);
-size_t requestFrom(uint8_t address, size_t quantity);
+size_t i2c_tools_requestFrom_w_stopbit(uint8_t address, size_t quantity, bool stopBit);
+size_t i2c_tools_requestFrom(uint8_t address, size_t quantity);
 
-size_t write(uint8_t data);
-size_t write_w_quantity(const uint8_t *data, size_t quantity);
+size_t i2c_tools_write(uint8_t data);
+size_t i2c_tools_write_w_quantity(const uint8_t *data, size_t quantity);
 
-int available(void);
-int read(void);
-int peek(void);
-void flush(void);
+int i2c_tools_available(void);
+int i2c_tools_read(void);
+int i2c_tools_peek(void);
+void i2c_tools_flush(void);
 void hexToAscii(uint32_t n);
 
-inline size_t write_ulong(unsigned long n)
+inline size_t i2c_tools_write_ulong(unsigned long n)
 {
-    return write((uint8_t)n);
+    return i2c_tools_write((uint8_t)n);
 }
-inline size_t write_long(long n)
+inline size_t i2c_tools_write_long(long n)
 {
-    return write((uint8_t)n);
+    return i2c_tools_write((uint8_t)n);
 }
-inline size_t write_uint(unsigned int n)
+inline size_t i2c_tools_write_uint(unsigned int n)
 {
-    return write((uint8_t)n);
+    return i2c_tools_write((uint8_t)n);
 }
-inline size_t write_int(int n)
+inline size_t i2c_tools_write_int(int n)
 {
-    return write((uint8_t)n);
+    return i2c_tools_write((uint8_t)n);
 }
 
 typedef enum

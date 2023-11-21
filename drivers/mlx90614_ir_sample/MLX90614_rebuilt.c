@@ -56,15 +56,15 @@ void MLX90614_I2C_writeReg(uint8_t reg, const void *pBuf)
     }
     uint8_t *_pBuf = (uint8_t *)pBuf;
     unsigned char crc_write[5] = {(uint8_t)(_deviceAddr << 1), reg, _pBuf[0], _pBuf[1], '\0'}; // the array prepared for calculating the check code
-    beginTransmission(_deviceAddr);
-    write(reg);
+    i2c_tools_beginTransmission(_deviceAddr);
+    i2c_tools_write(reg);
 
     for (size_t i = 0; i < 2; i++)
     {
-        write(_pBuf[i]);
+        i2c_tools_write(_pBuf[i]);
     }
-    write(MLX90614_crc8Polyomial107(crc_write, 4));
-    endTransmission();
+    i2c_tools_write(MLX90614_crc8Polyomial107(crc_write, 4));
+    i2c_tools_endTransmission();
 }
 
 size_t MLX90614_I2C_readReg(uint8_t reg, void *pBuf)
@@ -75,21 +75,21 @@ size_t MLX90614_I2C_readReg(uint8_t reg, void *pBuf)
         DBG("pBuf ERROR!! : null pointer");
     }
     uint8_t *_pBuf = (uint8_t *)pBuf;
-    beginTransmission(_deviceAddr);
-    write(reg);
-    if (0 != endTransmission_w_stopbit(false))
+    i2c_tools_beginTransmission(_deviceAddr);
+    i2c_tools_write(reg);
+    if (0 != i2c_tools_endTransmission_w_stopbit(false))
     {
         DBG("endTransmission ERROR!!");
     }
     else
     {
         // Master device requests size bytes from slave device, which can be accepted by master device with read() or available()
-        requestFrom(_deviceAddr, (size_t)3);
-        while (available())
+        i2c_tools_requestFrom(_deviceAddr, (size_t)3);
+        while (i2c_tools_available())
         {
-            _pBuf[count++] = (uint8_t)read(); // Use read() to receive and put into buf
+            _pBuf[count++] = (uint8_t)i2c_tools_read(); // Use read() to receive and put into buf
         }
-        endTransmission();
+        i2c_tools_endTransmission();
         // the array prepared for calculating the check code
         unsigned char crc_read[6] = {(uint8_t)(_deviceAddr << 1), reg, (uint8_t)((_deviceAddr << 1) | 1), _pBuf[0], _pBuf[1], '\0'};
 
@@ -237,10 +237,10 @@ void MLX90614_enterSleepMode(bool mode)
     if (mode)
     {
         // sleep command, refer to the chip datasheet
-        beginTransmission(_deviceAddr);
-        write(MLX90614_SLEEP_MODE);
-        write(MLX90614_SLEEP_MODE_PEC);
-        endTransmission();
+        i2c_tools_beginTransmission(_deviceAddr);
+        i2c_tools_write(MLX90614_SLEEP_MODE);
+        i2c_tools_write(MLX90614_SLEEP_MODE_PEC);
+        i2c_tools_endTransmission();
         DBG("enter sleep mode");
     }
     else
@@ -257,10 +257,10 @@ void MLX90614_enterSleepMode(bool mode)
         digitalWrite(MLX90614_SDA, LOW);
         sleep_ms(50);
 
-        begin(); // Wire.h（I2C）library function initialize wire library
+        i2c_tools_begin(); // Wire.h（I2C）library function initialize wire library
 
-        beginTransmission(_deviceAddr);
-        endTransmission();
+        i2c_tools_beginTransmission(_deviceAddr);
+        i2c_tools_endTransmission();
         DBG("exit sleep mode");
     }
     sleep_ms(200);
