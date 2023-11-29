@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+#include "pico/stdlib.h"
+
+#include "ws2812b_Rebuilt.h"
+
+int main()
+{
+    stdio_init_all();
+    ws2812b_init_all();
+    int delay = 1000;
+    while (true)
+    {
+        set_onboard_led_hex("FF0000");
+        show_onboard_led();
+        set_onboard_led_hex("00FF00");
+        show_onboard_led();
+        set_onboard_led_hex("0000FF");
+        show_onboard_led();
+    }
+}

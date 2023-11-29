@@ -5,13 +5,26 @@ get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 add_executable(
     ${PROJECT_NAME} # Use the folder name as the target name
     ${PROJECT_NAME}.c
-    ws2812b_Rebuilt.c
-    cycle_delay.S
+    mqtt_Rebuilt.c      #Provides MQTT functionality
+    ws2812b_Rebuilt.c   #The LED Library (reserved for future use)
+    cycle_delay.S       #Custom Made Delay Function used by the LED Library
+    NFA4X10_Rebuilt.c
+)
+target_include_directories( ${PROJECT_NAME} PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR} 
 )
 
 target_link_libraries(
     ${PROJECT_NAME} 
     pico_stdlib              # for core functionality
+    hardware_gpio
+    hardware_i2c
+    hardware_irq
+    hardware_clocks
+    hardware_pwm 
+    pico_lwip_mqtt
+    #pico_cyw43_arch_lwip_threadsafe_background #Background Interrupt Mode (Choose one)
+    pico_cyw43_arch_lwip_poll #Polling Mode (Choose one) 
 )
 
 # enable usb output, enable uart output
