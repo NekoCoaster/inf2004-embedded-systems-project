@@ -6,12 +6,19 @@ add_executable(
     ${PROJECT_NAME} # Use the folder name as the target name
     ${PROJECT_NAME}.c
     ws2812b_Rebuilt.c
+    mqtt_Rebuilt.c
     cycle_delay.S
+)
+target_include_directories( ${PROJECT_NAME} PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR} 
 )
 
 target_link_libraries(
     ${PROJECT_NAME} 
     pico_stdlib              # for core functionality
+    pico_lwip_mqtt
+    #pico_cyw43_arch_lwip_threadsafe_background #Background Interrupt Mode (Choose one)
+    pico_cyw43_arch_lwip_poll #Polling Mode (Choose one) 
 )
 
 # enable usb output, enable uart output

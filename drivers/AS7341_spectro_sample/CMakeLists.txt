@@ -5,13 +5,22 @@ get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 add_executable(
     ${PROJECT_NAME} # Use the folder name as the target name
     ${PROJECT_NAME}.c
-    ws2812b_Rebuilt.c
-    cycle_delay.S
+    i2c_tools.c
+    AS7341_Rebuilt.c
+    
 )
+# Include the current directory
+target_include_directories(
+    ${PROJECT_NAME} PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(
     ${PROJECT_NAME} 
-    pico_stdlib              # for core functionality
+    pico_stdlib              # for core functionality    pico_stdlib
+    hardware_gpio
+    hardware_i2c
+    hardware_irq
+    hardware_clocks
 )
 
 # enable usb output, enable uart output

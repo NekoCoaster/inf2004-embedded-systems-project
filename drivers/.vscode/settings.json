@@ -33,7 +33,23 @@
     "cmath": "c",
     "numeric": "cpp",
     "random": "cpp",
-    "gpio.h": "c"
+    "gpio.h": "c",
+    "algorithm": "cpp",
+    "array": "cpp",
+    "string": "cpp",
+    "string_view": "cpp",
+    "ranges": "cpp",
+    "fs3000_rebuilt.h": "c",
+    "deque": "c",
+    "unordered_map": "c",
+    "vector": "c",
+    "initializer_list": "c",
+    "utility": "c",
+    "stdlib.h": "c",
+    "ws2812b_rebuilt.h": "c",
+    "typeinfo": "c",
+    "system_error": "c",
+    "rosc.h": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
