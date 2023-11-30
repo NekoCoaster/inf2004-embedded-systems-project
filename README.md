@@ -44,7 +44,7 @@ The Nocuta fan is used to simulate a fan that is used to cool the plants in the 
 
 ## Wiring diagrams
 
-As msot of the sensors used in this project are I2C sensors, the wiring diagrams for the sensors are very similar. The only major difference is the pico that is in-charge of driving the 5V fan and the WS2812B LED strip.
+As most of the sensors used in this project are I2C sensors, the wiring diagrams for the sensors are very similar. The only major difference is the pico that is in-charge of driving the 5V fan and the WS2812B LED strip.
 
 ## 1. 5V Fan and WS2812B Wiring
 
