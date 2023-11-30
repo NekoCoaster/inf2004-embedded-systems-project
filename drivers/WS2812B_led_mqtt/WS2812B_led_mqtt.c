@@ -1,3 +1,8 @@
+/** @file WS2812B_led_mqtt.c
+ *  This is a sample program showcasing the use of the WS2812B library, along with the MQTT library.
+ *
+ */
+
 #include "hardware/structs/rosc.h"
 
 #include <stdio.h>
