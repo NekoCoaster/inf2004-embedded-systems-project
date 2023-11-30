@@ -4,6 +4,7 @@ The MQTT Dashboard visualise the Urban Farming sensor readings transmitted to th
 ## Getting Started
 ### Setup
 Ensure that Node.js is installed on your workstation.
+
 Install the dependencies and run the project
 ``` npm install && npm run dev ```
 
