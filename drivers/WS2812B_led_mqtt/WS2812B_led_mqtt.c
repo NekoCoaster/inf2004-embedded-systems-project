@@ -38,6 +38,15 @@ static u8_t topic_buffer[MQTT_BUFF_SIZE];
 static u8_t payload_cpy_index = 0;
 
 static char topic_sub_list[MQTT_TOTAL_SUBS][MQTT_BUFF_SIZE] = {"MKPICO_LED_HEX", "EXTERNAL_LED_HEX"};
+
+/**
+ * @brief Processes incoming MQTT messages and performs actions based on topics and payloads.
+ *
+ * This function is responsible for handling incoming MQTT messages. It prints information about
+ * the received message, including the topic and payload. Additionally, it performs specific actions
+ * based on the topic and payload content. In this example, it checks for specific topics related to LED control
+ * and sets the LED accordingly.
+ */
 static void process_incoming_message()
 {
     printf("New MQTT message received!\n");
@@ -101,6 +110,18 @@ static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
     }
 }
 
+/**
+ * @brief Callback function for handling MQTT payload data.
+ *
+ * This function is called when MQTT payload data is received. It appends the received
+ * data to a buffer, tracks the total payload length, and processes the complete message
+ * once the entire payload is received.
+ *
+ * @param arg     Pointer to user-defined argument (may be NULL).
+ * @param data    Pointer to the received payload data.
+ * @param len     Length of the received payload data.
+ * @param flags   Flags indicating additional information about the payload.
+ */
 static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags)
 {
     if (payload_total_len > 0)
@@ -118,6 +139,14 @@ static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags
     }
 }
 
+/**
+ * @brief Prints an IPv4 address in human-readable format.
+ *
+ * This function takes a 32-bit IPv4 address as input and prints its individual octets
+ * in the format "X.X.X.X", where X represents the decimal value of each octet.
+ *
+ * @param addr  32-bit unsigned integer representing the IPv4 address.
+ */
 static void printIPv4Address(unsigned int addr)
 {
     // Extracting individual octets
