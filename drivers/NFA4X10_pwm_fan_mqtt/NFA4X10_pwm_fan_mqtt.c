@@ -25,6 +25,9 @@
 
 #define SENSOR_READ_INTERVAL_MS 3000
 #define MQTT_PUBLISH_WAIT_MS 100
+
+#define SPECTRO_SENSOR_MQTT_CLIENT_PREFIX "<YourGroupName>/<MqttUsernameOfSpectroSensorPico>"
+
 #pragma region Non-Sensor Related stuff that you probably wouldnt care about
 
 #ifdef DEBUG
@@ -55,7 +58,7 @@ static char MQTT_SUB_TOPICS[MQTT_TOTAL_SUB_TOPICS][MQTT_BUFF_SIZE] = {
     MQTT_CLIENT_ID "/CMD",
     MQTT_CLIENT_ID "/DUTYCYCLE_OVERRIDE", // To override fan speed...
     MQTT_CLIENT_ID "/lightStatus",        // Override light status
-    "INF2004_T09/inf2004_zh/AS7341/visibleLight"};
+    SPECTRO_SENSOR_MQTT_CLIENT_PREFIX "/AS7341/visibleLight"};
 
 #pragma region MQTT incoming data functions
 
