@@ -43,15 +43,20 @@
 
 #define SCD4X_I2C_ADDRESS 0x62
 
+// @brief Constructor: Initializes a SensirionI2CScd4x object.
 SensirionI2CScd4x::SensirionI2CScd4x()
 {
 }
 
+// @brief Initialize the I2C communication.
+// @param i2cBus: A reference to the TwoWire object representing the I2C bus.
 void SensirionI2CScd4x::begin(TwoWire &i2cBus)
 {
     _i2cBus = &i2cBus;
 }
 
+// @brief Start a periodic CO2 concentration measurement.
+// @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::startPeriodicMeasurement()
 {
     uint16_t error;
@@ -70,6 +75,11 @@ uint16_t SensirionI2CScd4x::startPeriodicMeasurement()
     return error;
 }
 
+// @brief Read measured values in ticks.
+// @param co2: Reference to store the measured CO2 concentration.
+// @param temperature: Reference to store the measured temperature in ticks.
+// @param humidity: Reference to store the measured humidity in ticks.
+// @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::readMeasurementTicks(uint16_t &co2,
                                                  uint16_t &temperature,
                                                  uint16_t &humidity)
@@ -107,6 +117,11 @@ uint16_t SensirionI2CScd4x::readMeasurementTicks(uint16_t &co2,
     return error;
 }
 
+  // @brief Read measured values.
+  // @param co2: Reference to store the measured CO2 concentration.
+  // @param temperature: Reference to store the measured temperature in degrees Celsius.
+  // @param humidity: Reference to store the measured humidity as a percentage.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::readMeasurement(uint16_t &co2, float &temperature,
                                             float &humidity)
 {
@@ -124,7 +139,8 @@ uint16_t SensirionI2CScd4x::readMeasurement(uint16_t &co2, float &temperature,
     humidity = static_cast<float>(humidityTicks * 100.0 / 65535.0);
     return NoError;
 }
-
+// @brief Stop the periodic CO2 concentration measurement.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::stopPeriodicMeasurement()
 {
     uint16_t error;
@@ -143,6 +159,9 @@ uint16_t SensirionI2CScd4x::stopPeriodicMeasurement()
     return error;
 }
 
+ // @brief Get the temperature offset in ticks.
+  // @param tOffset: Reference to store the temperature offset in ticks.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getTemperatureOffsetTicks(uint16_t &tOffset)
 {
     uint16_t error;
@@ -175,7 +194,9 @@ uint16_t SensirionI2CScd4x::getTemperatureOffsetTicks(uint16_t &tOffset)
     error |= rxFrame.getUInt16(tOffset);
     return error;
 }
-
+ // @brief Get the temperature offset.
+  // @param tOffset: Reference to store the temperature offset in degrees Celsius.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getTemperatureOffset(float &tOffset)
 {
     uint16_t error;
@@ -190,7 +211,9 @@ uint16_t SensirionI2CScd4x::getTemperatureOffset(float &tOffset)
     tOffset = static_cast<float>(tOffsetTicks * 175.0 / 65536.0);
     return NoError;
 }
-
+// @brief Set the temperature offset in ticks.
+// @param tOffset: Temperature offset to set in ticks.
+// @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setTemperatureOffsetTicks(uint16_t tOffset)
 {
     uint16_t error;
@@ -210,6 +233,9 @@ uint16_t SensirionI2CScd4x::setTemperatureOffsetTicks(uint16_t tOffset)
     return error;
 }
 
+// @brief Set the temperature offset.
+// @param tOffset: Temperature offset to set in degrees Celsius.
+// @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setTemperatureOffset(float tOffset)
 {
     uint16_t tOffsetTicks =
@@ -217,6 +243,9 @@ uint16_t SensirionI2CScd4x::setTemperatureOffset(float tOffset)
     return setTemperatureOffsetTicks(tOffsetTicks);
 }
 
+  // @brief Set the sensor altitude.
+  // @param sensorAltitude: Sensor altitude to set.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getSensorAltitude(uint16_t &sensorAltitude)
 {
     uint16_t error;
@@ -249,7 +278,9 @@ uint16_t SensirionI2CScd4x::getSensorAltitude(uint16_t &sensorAltitude)
     error |= rxFrame.getUInt16(sensorAltitude);
     return error;
 }
-
+  // @brief Set the ambient pressure.
+  // @param ambientPressure: Ambient pressure to set.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setSensorAltitude(uint16_t sensorAltitude)
 {
     uint16_t error;
@@ -268,7 +299,10 @@ uint16_t SensirionI2CScd4x::setSensorAltitude(uint16_t sensorAltitude)
     delay(1);
     return error;
 }
-
+// @brief Perform a forced recalibration.
+  // @param targetCo2Concentration: Target CO2 concentration for recalibration.
+  // @param frcCorrection: Reference to store the FRC correction value.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setAmbientPressure(uint16_t ambientPressure)
 {
     uint16_t error;
@@ -287,6 +321,9 @@ uint16_t SensirionI2CScd4x::setAmbientPressure(uint16_t ambientPressure)
     delay(1);
     return error;
 }
+// @brief Get the status of automatic self-calibration.
+  // @param ascEnabled: Reference to store the status of automatic self-calibration.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 
 uint16_t
 SensirionI2CScd4x::performForcedRecalibration(uint16_t targetCo2Concentration,
@@ -323,7 +360,9 @@ SensirionI2CScd4x::performForcedRecalibration(uint16_t targetCo2Concentration,
     error |= rxFrame.getUInt16(frcCorrection);
     return error;
 }
-
+// @brief Set the status of automatic self-calibration.
+  // @param ascEnabled: Status of automatic self-calibration to set.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getAutomaticSelfCalibration(uint16_t &ascEnabled)
 {
     uint16_t error;
@@ -356,7 +395,9 @@ uint16_t SensirionI2CScd4x::getAutomaticSelfCalibration(uint16_t &ascEnabled)
     error |= rxFrame.getUInt16(ascEnabled);
     return error;
 }
-
+// @brief Get the initial period for automatic self-calibration.
+  // @param ascInitialPeriod: Reference to store the initial period for automatic self-calibration.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setAutomaticSelfCalibration(uint16_t ascEnabled)
 {
     uint16_t error;
@@ -375,7 +416,9 @@ uint16_t SensirionI2CScd4x::setAutomaticSelfCalibration(uint16_t ascEnabled)
     delay(1);
     return error;
 }
-
+ // @brief Get the standard period for automatic self-calibration.
+  // @param ascStandardPeriod: Reference to store the standard period for automatic self-calibration.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getAutomaticSelfCalibrationInitialPeriod(
     uint16_t &ascInitialPeriod)
 {
@@ -409,7 +452,9 @@ uint16_t SensirionI2CScd4x::getAutomaticSelfCalibrationInitialPeriod(
     error |= rxFrame.getUInt16(ascInitialPeriod);
     return error;
 }
-
+// @brief Set the initial period for automatic self-calibration.
+  // @param ascInitialPeriod: Initial period for automatic self-calibration to set.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getAutomaticSelfCalibrationStandardPeriod(
     uint16_t &ascStandardPeriod)
 {
@@ -443,7 +488,9 @@ uint16_t SensirionI2CScd4x::getAutomaticSelfCalibrationStandardPeriod(
     error |= rxFrame.getUInt16(ascStandardPeriod);
     return error;
 }
-
+  // @brief Set the initial period for automatic self-calibration.
+  // @param ascInitialPeriod: Initial period for automatic self-calibration to set.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setAutomaticSelfCalibrationInitialPeriod(
     uint16_t &ascInitialPeriod)
 {
@@ -463,7 +510,9 @@ uint16_t SensirionI2CScd4x::setAutomaticSelfCalibrationInitialPeriod(
     delay(1);
     return error;
 }
-
+ // @brief Set the standard period for automatic self-calibration.
+  // @param ascStandardPeriod: Standard period for automatic self-calibration to set.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::setAutomaticSelfCalibrationStandardPeriod(
     uint16_t &ascStandardPeriod)
 {
@@ -483,7 +532,8 @@ uint16_t SensirionI2CScd4x::setAutomaticSelfCalibrationStandardPeriod(
     delay(1);
     return error;
 }
-
+  // @brief Start a low-power periodic CO2 concentration measurement.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::startLowPowerPeriodicMeasurement()
 {
     uint16_t error;
@@ -499,6 +549,9 @@ uint16_t SensirionI2CScd4x::startLowPowerPeriodicMeasurement()
     return SensirionI2CCommunication::sendFrame(SCD4X_I2C_ADDRESS, txFrame,
                                                 *_i2cBus);
 }
+  // @brief Get the data ready flag.
+  // @param dataReady: Reference to store the data ready flag.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 
 uint16_t SensirionI2CScd4x::getDataReadyFlag(bool &dataReady)
 {
@@ -534,7 +587,8 @@ uint16_t SensirionI2CScd4x::getDataReadyFlag(bool &dataReady)
     dataReady = (localDataReady & 0x07FF) != 0;
     return error;
 }
-
+  // @brief Persist the current sensor settings.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::persistSettings()
 {
     uint16_t error;
@@ -552,7 +606,11 @@ uint16_t SensirionI2CScd4x::persistSettings()
     delay(800);
     return error;
 }
-
+// @brief Get the serial number of the sensor.
+  // @param serial0: Reference to store the first part of the serial number.
+  // @param serial1: Reference to store the second part of the serial number.
+  // @param serial2: Reference to store the third part of the serial number.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::getSerialNumber(uint16_t &serial0,
                                             uint16_t &serial1,
                                             uint16_t &serial2)
@@ -589,7 +647,9 @@ uint16_t SensirionI2CScd4x::getSerialNumber(uint16_t &serial0,
     error |= rxFrame.getUInt16(serial2);
     return error;
 }
-
+  // @brief Perform a self-test on the sensor.
+  // @param sensorStatus: Reference to store the sensor status after the self-test.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::performSelfTest(uint16_t &sensorStatus)
 {
     uint16_t error;
@@ -622,7 +682,8 @@ uint16_t SensirionI2CScd4x::performSelfTest(uint16_t &sensorStatus)
     error |= rxFrame.getUInt16(sensorStatus);
     return error;
 }
-
+// @brief Perform a factory reset on the sensor.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::performFactoryReset()
 {
     uint16_t error;
@@ -640,6 +701,8 @@ uint16_t SensirionI2CScd4x::performFactoryReset()
     delay(800);
     return error;
 }
+// @brief Reinitialize the sensor.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 
 uint16_t SensirionI2CScd4x::reinit()
 {
@@ -658,7 +721,8 @@ uint16_t SensirionI2CScd4x::reinit()
     delay(20);
     return error;
 }
-
+  // @brief Perform a single-shot CO2 concentration measurement.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::measureSingleShot()
 {
     uint16_t error;
@@ -676,7 +740,8 @@ uint16_t SensirionI2CScd4x::measureSingleShot()
     delay(5000);
     return error;
 }
-
+  // @brief Perform a single-shot RHT (Relative Humidity and Temperature) measurement.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::measureSingleShotRhtOnly()
 {
     uint16_t error;
@@ -694,7 +759,8 @@ uint16_t SensirionI2CScd4x::measureSingleShotRhtOnly()
     delay(50);
     return error;
 }
-
+  // @brief Power down the sensor.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::powerDown()
 {
     uint16_t error;
@@ -712,7 +778,8 @@ uint16_t SensirionI2CScd4x::powerDown()
     delay(1);
     return error;
 }
-
+  // @brief Wake up the sensor.
+  // @return uint16_t: Error code (0 for success, non-zero for failure).
 uint16_t SensirionI2CScd4x::wakeUp()
 {
     uint16_t error;
