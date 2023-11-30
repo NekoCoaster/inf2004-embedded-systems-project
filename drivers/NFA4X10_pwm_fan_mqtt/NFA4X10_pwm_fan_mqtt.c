@@ -1,3 +1,17 @@
+/** @file NFA4X10_pwm_fan_mqtt.c
+ *
+ * This is the main code for the pico that is in charge of controlling both the fan, and the WS2812B LED strip.
+ * The code first initializes the fan driver and the WS2812B LED strip, and then connects to the MQTT server.
+ * Upon successful connection, the code will then subscribe to all the predefined MQTT topics, one to control the fan speed,
+ * and the other to control the LED strip.
+ *
+ * The code will then enter a loop where it will read the fan speed and publish it to MQTT.
+ *
+ * When the pico that's connected to the AS7341 infrared sensor publishes the ambient light level to MQTT,
+ * this pico will then read the ambient light level and turn on or off the LED strip accordingly.
+ *
+ */
+
 #include "hardware/structs/rosc.h"
 
 #include <stdio.h>
