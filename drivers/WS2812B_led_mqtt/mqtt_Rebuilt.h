@@ -1,4 +1,10 @@
-
+/** @file mqtt_Rebuilt.h
+ *
+ * Disclaimer: While this code does uses the included mqtt client lirary that comes with the Pico SDK,
+ * The example code that demonstrates how to use the included mqtt client library was written by Craig Niles (@cniles) from the following repository: https://github.com/cniles/picow-iot
+ * While Craig Niles' example code was used as a reference for how to use the included mqtt client library in this project,
+ * It has since then been heavily modified to fit the needs of this project.
+ */
 
 #ifndef MQTT_REBUILT_H
 #define MQTT_REBUILT_H
