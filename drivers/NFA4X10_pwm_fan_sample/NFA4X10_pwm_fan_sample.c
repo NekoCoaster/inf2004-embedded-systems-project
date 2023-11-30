@@ -1,3 +1,9 @@
+/**
+NOTE: Sample code for PWM Fan...
+
+Starts from 20%, inrements to 100% before resetting back to 20%...
+*/
+
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "NFA4X10_Rebuilt.h"
