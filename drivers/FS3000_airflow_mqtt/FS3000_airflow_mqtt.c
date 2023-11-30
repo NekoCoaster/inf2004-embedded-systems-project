@@ -48,6 +48,22 @@ static char MQTT_SUB_TOPICS[MQTT_TOTAL_SUB_TOPICS][MQTT_BUFF_SIZE] = {MQTT_CLIEN
 static char MQTT_PUB_TOPICS[MQTT_TOTAL_PUB_TOPICS][MQTT_BUFF_SIZE] = {MQTT_CLIENT_ID};
 
 #pragma region MQTT incoming data functions
+/**
+ * @brief Processes incoming MQTT messages.
+ *
+ * This function is responsible for handling incoming MQTT messages. It prints
+ * information about the received message, such as the topic, payload index, and payload content.
+ * After printing the message details, additional processing can be implemented based on the
+ * topic and payload values.
+ *
+ * @param topic_buffer The buffer containing the topic of the received MQTT message.
+ * @param payload_cpy_index The index indicating the position in the payload buffer where
+ * the relevant data begins.
+ * @param payload_buffer The buffer containing the payload of the received MQTT message.
+ * The payload typically contains the actual data associated with the MQTT message.
+ *
+ * @return void
+ */
 static void process_incoming_message()
 {
     printf("New MQTT message received!\n");
@@ -55,7 +71,6 @@ static void process_incoming_message()
     // do stuff here. maybe use a switch case to handle different topics,
     // and then based on the topic, do different things based on the payload value
 }
-
 // You'll need 2 functions to handle incoming messages
 // 1. mqtt_incoming_notification_cb
 // 2. mqtt_incoming_payload_cb
@@ -95,6 +110,25 @@ static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
     }
 }
 
+/**
+ * @brief Callback function for reading MQTT payload data.
+ *
+ * This function is a callback used by the MQTT client to handle incoming payload data.
+ * It is typically called as part of the MQTT message reception process. The function
+ * updates the payload buffer with the received data and triggers further processing
+ * once the entire payload is received.
+ *
+ * @param arg A pointer to user-defined data. In most cases, this is used to pass
+ * context information to the callback function.
+ * 
+ * @param data A pointer to the received payload data.
+ * 
+ * @param len The length of the received payload data.
+ * 
+ * @param flags Flags providing additional information about the received payload.
+ * 
+ * @return void
+ */
 static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags)
 {
     if (payload_total_len > 0)
@@ -112,6 +146,16 @@ static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags
     }
 }
 
+/**
+ * @brief Subscribe to all predefined MQTT topics.
+ *
+ * This function iterates through an array of MQTT subscription topics
+ * and subscribes to each one using the `mqtt_subscribe_topic` function.
+ * After each successful subscription, a message is printed to indicate
+ * that the subscription to a specific topic has been completed.
+ *
+ * @return void
+ */
 static void mqtt_subscribe_to_all_topics()
 {
     for (int i = 0; i < MQTT_TOTAL_SUB_TOPICS; i++)
@@ -120,10 +164,29 @@ static void mqtt_subscribe_to_all_topics()
         printf("Subscribed to topic: %s\n", MQTT_SUB_TOPICS[i]);
     }
 }
+
 #pragma endregion
 
 #pragma region MQTT publish section
 
+/**
+ * @brief Publishes sensor data formatted as JSON to an MQTT topic.
+ *
+ * This function constructs an MQTT topic based on the MQTT client ID and the
+ * provided sensor name. It then formats the sensor data as a JSON message
+ * using the provided arrays of value names and sensor values. The resulting
+ * JSON message is printed or sent using the `mqtt_publish_data` function.
+ *
+ * @param sensorName The name of the sensor for which data is being published.
+ * 
+ * @param valueNames An array containing the names of the sensor values.
+ * 
+ * @param sensorValues An array containing the corresponding sensor values.
+ * 
+ * @param numValues The number of values in the `valueNames` and `sensorValues` arrays.
+ * 
+ * @return void
+ */
 static void publishSensorDataFormatToJson(const char *sensorName, char *valueNames[], char *sensorValues[], size_t numValues)
 {
     char topic[MQTT_BUFF_SIZE];
@@ -165,20 +228,48 @@ static void publishSensorDataFormatToJson(const char *sensorName, char *valueNam
     printf("Published to topic: %s, message: %s\n", topic, jsonMessage);
 }
 
+/**
+ * @brief Publishes sensor data in JSON format to an MQTT topic.
+ *
+ * This function constructs an MQTT topic based on the MQTT client ID and the
+ * provided sensor name. It then publishes the provided JSON-formatted sensor
+ * data to the constructed topic using the `mqtt_publish_data` function.
+ *
+ * @param sensorName The name of the sensor for which data is being published.
+ * 
+ * @param JsonString A JSON-formatted string containing the sensor data to be published.
+ * 
+ * @return void
+ */
 static void publishSensorData(const char *sensorName, const char *JsonString)
 {
     char topic[MQTT_BUFF_SIZE];
 
     // Construct the topic: clientid/sensorname
     snprintf(topic, MQTT_BUFF_SIZE, "%s/%s", MQTT_CLIENT_ID, sensorName);
+    
+    // Publish the JSON-formatted sensor data to the MQTT topic
     if (mqtt_publish_data(topic, JsonString) != ERR_OK)
     {
         printf("Failed to publish to topic: %s, message: %s\n", topic, JsonString);
         return;
     }
+    
     printf("Published to topic: %s, message: %s\n", topic, JsonString);
 }
 #pragma endregion
+/**
+ * @brief Prints an IPv4 address in human-readable format.
+ *
+ * This function takes a 32-bit unsigned integer representing an IPv4 address
+ * and prints it in the standard dot-decimal notation (e.g., "192.168.0.1").
+ * The address is divided into individual octets, and each octet is printed
+ * in decimal format.
+ *
+ * @param addr The 32-bit unsigned integer representing the IPv4 address.
+ * 
+ * @return void
+ */
 static void printIPv4Address(unsigned int addr)
 {
     // Extracting individual octets
@@ -194,6 +285,16 @@ static void printIPv4Address(unsigned int addr)
 #pragma endregion
 
 #pragma endregion
+/**
+ * @brief Reconnects to the MQTT server, sets custom callbacks, publishes online status, and subscribes to topics.
+ *
+ * This function attempts to establish a connection to the MQTT server using the `mqtt_begin_connection` function.
+ * If the connection attempt fails, it retries every 5 seconds until successful. Once connected, it sets custom
+ * MQTT callback functions using `set_mqtt_subscribe_callback`, publishes an online status message to a predefined
+ * MQTT topic using `mqtt_publish_data`, and subscribes to all predefined MQTT topics using `mqtt_subscribe_to_all_topics`.
+ *
+ * @return void
+ */
 void mqtt_reconnect()
 {
     while (mqtt_begin_connection() != ERR_OK)
@@ -201,15 +302,31 @@ void mqtt_reconnect()
         printf("Failed to connect to MQTT server. Retrying in 5 seconds...\n");
         sleep_ms(5000);
     }
+    
     printf("Connected to MQTT server.\n");
+
     // set our custom callback functions
     set_mqtt_subscribe_callback(mqtt_notify, mqtt_read_payload, NULL);
+
     // publish our online status
     mqtt_publish_data(MQTT_PUB_TOPICS[0], "ONLINE");
+
     // subscribe to all topics
     mqtt_subscribe_to_all_topics();
 }
+
 // Function to read spectral data for sensors 1 to 8 and publish to MQTT, based on timer
+/**
+ * @brief Reads sensor data from an FS3000 sensor and publishes it to the MQTT server.
+ *
+ * This function first checks if the MQTT server is connected by publishing an "ONLINE" status message
+ * to a predefined MQTT topic. If the MQTT server is disconnected, it attempts to reconnect using the
+ * `mqtt_reconnect` function. After ensuring a connection, it reads sensor data from an FS3000 sensor
+ * and formats it into a JSON payload. The payload is then published to a predefined MQTT topic using
+ * the `publishSensorData` function.
+ *
+ * @return void
+ */
 void readSensorDataAndPublish()
 {
     // Check if MQTT is connected by publishing "ONLINE" to the MQTT server
@@ -219,11 +336,13 @@ void readSensorDataAndPublish()
         mqtt_reconnect();
     }
 
+    // Read sensor data from FS3000 and format it into a JSON payload
     snprintf(MQTT_PUB_PAYLOAD_BUFFER, MQTT_BUFF_SIZE, "{\"RAW\":%d,\"metersPerSec\":%.2f,\"milesPerHour\":%.2f}",
              FS3000_readRaw(),
              FS3000_readMetersPerSecond(),
              FS3000_readMilesPerHour());
 
+    // Publish the sensor data to the MQTT server
     publishSensorData("FS3000", MQTT_PUB_PAYLOAD_BUFFER);
 }
 

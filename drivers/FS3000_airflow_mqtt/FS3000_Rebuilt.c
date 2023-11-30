@@ -197,9 +197,28 @@ void FS3000_readData(uint8_t *buffer_in)
  * [4]generic checksum data
  */
 
+/**
+ * @brief Calculates and verifies the checksum for FS3000 sensor data.
+ *
+ * This function takes an array of 5 data bytes, calculates the checksum,
+ * and verifies it against the received checksum byte. The calculated checksum
+ * is displayed if the `show_debug` parameter is set to true. The function returns
+ * true if the checksum is valid, indicating that the data integrity is maintained,
+ * and false otherwise.
+ *
+ * @param data_in An array containing 5 data bytes, including the received checksum byte.
+ * 
+ * @param show_debug A boolean flag indicating whether to display debug information,
+ * including the calculated checksum and other intermediate values.
+ * 
+ * @return Returns true if the calculated checksum matches the received checksum, indicating
+ * valid data integrity. Returns false otherwise.
+ */
 bool FS3000_checksum(uint8_t *data_in, bool show_debug)
 {
     uint8_t sum = 0;
+
+    // Calculate the sum of the data bytes excluding the checksum byte
     for (int i = 1; i <= 4; i++)
     {
         sum += (uint8_t)(data_in[i]);
@@ -207,6 +226,7 @@ bool FS3000_checksum(uint8_t *data_in, bool show_debug)
 
     if (show_debug)
     {
+        // Display the received data bytes and the calculated sum
         for (int i = 0; i < 5; i++)
         {
             hexToAscii(_buff[i]);
@@ -216,14 +236,15 @@ bool FS3000_checksum(uint8_t *data_in, bool show_debug)
         FS3000_printHexByte(sum);
     }
 
+    // Calculate the checksum and verify it against the received checksum byte
     sum %= 256;
-    // uint8_t calculated_cksum = -sum;
     uint8_t calculated_cksum = (~(sum) + 1);
     uint8_t crcbyte = data_in[0];
     uint8_t overall = sum + crcbyte;
 
     if (show_debug)
     {
+        // Display the calculated checksum, received checksum byte, and the overall sum
         printf("Calculated checksum                              = ");
         FS3000_printHexByte(calculated_cksum);
         printf("Received checksum byte                           = ");
@@ -233,6 +254,7 @@ bool FS3000_checksum(uint8_t *data_in, bool show_debug)
         printf("\n");
     }
 
+    // Return true if the overall sum is 0, indicating valid data integrity
     if (overall != 0x00)
     {
         return false;
@@ -240,13 +262,31 @@ bool FS3000_checksum(uint8_t *data_in, bool show_debug)
     return true;
 }
 
+/**
+ * @brief Prints a byte in hexadecimal format with a "0x" prefix.
+ *
+ * This function takes a single byte, `x`, and prints its hexadecimal representation
+ * with a "0x" prefix. If the byte is less than 16, a leading zero is added for clarity.
+ * The function then prints a newline character for formatting purposes.
+ *
+ * @param x The byte to be printed in hexadecimal format.
+ * 
+ * @return void
+ */
 void FS3000_printHexByte(uint8_t x)
 {
+    // Print "0x" prefix
     printf("0x");
+
+    // Add leading zero if the byte is less than 16
     if (x < 16)
     {
         printf("0");
     }
+
+    // Print the hexadecimal representation of the byte
     hexToAscii(x);
+
+    // Print a newline character for formatting
     printf("\n");
 }
