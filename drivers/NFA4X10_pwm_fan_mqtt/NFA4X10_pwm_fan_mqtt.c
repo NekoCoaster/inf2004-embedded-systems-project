@@ -53,33 +53,37 @@ static int fan_speed_override = -1;
 
 static char MQTT_SUB_TOPICS[MQTT_TOTAL_SUB_TOPICS][MQTT_BUFF_SIZE] = {
     MQTT_CLIENT_ID "/CMD",
-    MQTT_CLIENT_ID "/DUTYCYCLE_OVERRIDE",
-    MQTT_CLIENT_ID "/lightStatus",
-    "INF2004_T09/inf2004_zh/AS7341/visibleLight"};
+    MQTT_CLIENT_ID "/DUTYCYCLE_OVERRIDE", // To override fan speed...
+    MQTT_CLIENT_ID "/lightStatus", // Override light status
+    "INF2004_T09/inf2004_zh/AS7341/visibleLight"
+};
 
 #pragma region MQTT incoming data functions
+
+/**
+ * @brief Trigger to process the message on the topic buffer and payload buffer...
+ * (Conditional handling based on MQTT topic...)
+ */
 static void process_incoming_message()
 {
     printf("New MQTT message received!\n");
     printf("%s[%d]: %s\n", topic_buffer, payload_cpy_index, payload_buffer);
 
+    // NOTE: Sometimes there is a bug where the topic's title comes with a random character 't',
+    // this is a 'hack' to just remove the 't' character if it comes with it ....
     const char *targetTopic = "INF2004_T09/inf2004_ty/DUTYCYCLE_OVERRIDEt";
-    // Check if topic_buffer matches the target topic
     if (strcmp(topic_buffer, targetTopic) == 0)
     {
-        // Check if the length of topic_buffer is greater than 0
         size_t length = strlen(topic_buffer);
         if (length > 0 && topic_buffer[length - 1] == 't')
         {
-            // Remove the trailing 't' by replacing it with a null terminator
             topic_buffer[length - 1] = '\0';
         }
     }
 
-    // do stuff here. maybe use a switch case to handle different topics,
-    // and then based on the topic, do different things based on the payload value
     if (strcmp(topic_buffer, MQTT_SUB_TOPICS[1]) == 0)
     {
+        // NOTE: MQTT Command to override fan speed...
         fan_speed_override = atoi(payload_buffer);
         printf("Override fan speed: %d\n", fan_speed_override);
 
@@ -90,6 +94,7 @@ static void process_incoming_message()
     }
     else if (strcmp(topic_buffer, MQTT_SUB_TOPICS[2]) == 0)
     {
+        // NOTE: MQTT Command to override light status...
         if (strcmp(topic_buffer, MQTT_SUB_TOPICS[2]) == 0)
         {
 
@@ -149,14 +154,21 @@ static void process_incoming_message()
     }
 }
 
-// You'll need 2 functions to handle incoming messages
-// 1. mqtt_incoming_notification_cb
-// 2. mqtt_incoming_payload_cb
-// The first function is called when a new message is received.
-// This function will tell you the topic and the total length of the message.
-// The second function will then be called only if the payload is not empty.
-// This function will be called multiple times until the entire payload is received.
-//
+/**
+NOTE: You'll need 2 functions to handle incoming messages
+    1. mqtt_incoming_notification_cb
+    This function is called when a new message is received.
+    This function will tell you the topic and the total length of the message.
+
+    2. mqtt_incoming_payload_cb
+    This function will then be called only if the payload is not empty.
+    This function will be called multiple times until the entire payload is received.
+*/
+
+/**
+ * @brief Subcription function, sends the incoming MQTT Message to 'process_incoming_message'.
+ * It will discord topic's messages that have a greater size than the buffer...
+ */
 static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
 {
     DEBUG_printf("Incoming topic: '%s', total length: %u\n", topic, (unsigned int)tot_len);
@@ -173,6 +185,7 @@ static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
         payload_total_len = 0;
         return;
     }
+
     memcpy(topic_buffer, topic, strlen(topic));
     payload_total_len = tot_len;
     payload_cpy_index = 0;
@@ -180,8 +193,8 @@ static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
     {
         // If the payload is empty, then erase the payload buffer
         // And then call the process_incoming_message() function
-        //  since when there is no payload, the mqtt_read_payload() function will not be called
-        //  and thus the process_incoming_message() function will not be called as well
+        // since when there is no payload, the mqtt_read_payload() function will not be called
+        // and thus the process_incoming_message() function will not be called as well
         // So we have to call it manually here instead.
         memset(payload_buffer, 0, MQTT_BUFF_SIZE);
         process_incoming_message();
@@ -205,6 +218,9 @@ static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags
     }
 }
 
+/**
+ * @brief Subscribes to all predefined MQTT topics.
+ */
 static void mqtt_subscribe_to_all_topics()
 {
     // Subscribe to all topics
@@ -215,30 +231,19 @@ static void mqtt_subscribe_to_all_topics()
             printf("Failed to subscribe to topic: %s\n", MQTT_SUB_TOPICS[i]);
         }
     }
-    /*legacy code. Fail safe has been implemented in mqtt_subscribe_topic()
-    /*
-    int topic_id = 0;
-    while (1)
-    {
-        cyw43_arch_poll();
-        if (readyForNextPubSub())
-        {
-            if (mqtt_subscribe_topic(MQTT_SUB_TOPICS[topic_id], SUB) == ERR_OK)
-            {
-                // printf("Subscribed to topic: %s\n", MQTT_SUB_TOPICS[topic_id]);
-                topic_id++;
-            }
-            if (topic_id >= MQTT_TOTAL_SUB_TOPICS)
-            {
-                break;
-            }
-        }
-    }*/
 }
+
 #pragma endregion
 
 #pragma region MQTT publish section
 
+/**
+ * @brief Publishes sensor data in JSON format to MQTT.
+ * @param sensorName: Name of the sensor.
+ * @param valueNames: Array of value names.
+ * @param sensorValues: Array of sensor values.
+ * @param numValues: Number of values in the arrays.
+ */
 static void publishSensorDataFormatToJson(const char *sensorName, char *valueNames[], char *sensorValues[], size_t numValues)
 {
     char topic[MQTT_BUFF_SIZE];
@@ -280,6 +285,11 @@ static void publishSensorDataFormatToJson(const char *sensorName, char *valueNam
     printf("Published to topic: %s, message: %s\n", topic, jsonMessage);
 }
 
+/**
+ * @brief Publishes sensor data to MQTT.
+ * @param sensorName: Name of the sensor.
+ * @param JsonString: JSON-formatted sensor data.
+ */
 static void publishSensorData(const char *sensorName, const char *JsonString)
 {
     char topic[MQTT_BUFF_SIZE];
@@ -300,6 +310,10 @@ static void publishSensorData(const char *sensorName, const char *JsonString)
     printf("Published to topic: %s, message: %s\n", topic, JsonString);
 }
 #pragma endregion
+
+/**
+ * @brief Attempts to reconnect to the MQTT server.
+ */
 static void printIPv4Address(unsigned int addr)
 {
     // Extracting individual octets
@@ -315,6 +329,10 @@ static void printIPv4Address(unsigned int addr)
 #pragma endregion
 
 #pragma endregion
+
+/**
+ * @brief Attempts to reconnect to the MQTT server.
+ */
 void mqtt_reconnect()
 {
     cyw43_arch_poll();
@@ -331,7 +349,11 @@ void mqtt_reconnect()
     // subscribe to all topics
     mqtt_subscribe_to_all_topics();
 }
-// Function to read spectral data for sensors 1 to 8 and publish to MQTT, based on timer
+
+
+/**
+ * @brief Reads spectral data for sensors 1 to 8 and publishes it to MQTT based on a timer.
+ */
 void readSensorDataAndPublish()
 {
     // Check if MQTT is connected by publishing "ONLINE" to the MQTT server
