@@ -13,6 +13,13 @@
  * @url https://github.com/DFRobot/DFRobot_AS7341
  */
 
+/* This header file includes the necessary 
+ * enumerations, structures, and function prototypes for 
+ * the AS7341 spectrometer click header file. 
+ * It defines registers, error codes, 
+ * enums for different modes and channels, and function 
+ * declarations for various functionalities of the sensor.
+ */
 #ifndef DFROBOT_AS7341_H
 #define DFROBOT_AS7341_H
 
@@ -173,6 +180,7 @@ typedef struct
     uint16_t ADNIR;   /**<NIR diode data>*/
 } AS7341_sModeTwoData_t;
 
+// Functions for AS7341 methods
 /**
  * @fn DFRobot_AS7341
  * @brief Construct the function

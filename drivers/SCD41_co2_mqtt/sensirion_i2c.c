@@ -34,6 +34,13 @@
 #include "sensirion_config.h"
 #include "sensirion_i2c_hal.h"
 
+/**
+ * @brief Generate a CRC8 checksum for the given data.
+ *
+ * @param data Pointer to the array of data bytes.
+ * @param count Number of bytes in the data array.
+ * @return Calculated CRC8 checksum.
+ */
 uint8_t sensirion_i2c_generate_crc(const uint8_t* data, uint16_t count) {
     uint16_t current_byte;
     uint8_t crc = CRC8_INIT;
@@ -51,19 +58,37 @@ uint8_t sensirion_i2c_generate_crc(const uint8_t* data, uint16_t count) {
     }
     return crc;
 }
-
+/**
+ * @brief Generate a CRC8 checksum for the given data.
+ *
+ * @param data Pointer to the array of data bytes.
+ * @param count Number of bytes in the data array.
+ * @return Calculated CRC8 checksum.
+ */
 int8_t sensirion_i2c_check_crc(const uint8_t* data, uint16_t count,
                                uint8_t checksum) {
     if (sensirion_i2c_generate_crc(data, count) != checksum)
         return CRC_ERROR;
     return NO_ERROR;
 }
-
+/**
+ * @brief Send a general call reset command.
+ *
+ * @return Error code.
+ */
 int16_t sensirion_i2c_general_call_reset(void) {
     const uint8_t data = 0x06;
     return sensirion_i2c_hal_write(0, &data, (uint16_t)sizeof(data));
 }
-
+/**
+ * @brief Fill the command send buffer with a command and its arguments.
+ *
+ * @param buf Pointer to the buffer where the command and arguments will be stored.
+ * @param cmd Command code.
+ * @param args Pointer to the array of arguments.
+ * @param num_args Number of arguments.
+ * @return Size of the filled buffer.
+ */
 uint16_t sensirion_i2c_fill_cmd_send_buf(uint8_t* buf, uint16_t cmd,
                                          const uint16_t* args,
                                          uint8_t num_args) {
@@ -83,7 +108,14 @@ uint16_t sensirion_i2c_fill_cmd_send_buf(uint8_t* buf, uint16_t cmd,
     }
     return idx;
 }
-
+/**
+ * @brief Read data as bytes from the I2C interface.
+ *
+ * @param address I2C device address.
+ * @param data Pointer to the data array where the read bytes will be stored.
+ * @param num_words Number of 16-bit words to read.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_read_words_as_bytes(uint8_t address, uint8_t* data,
                                           uint16_t num_words) {
     int16_t ret;
@@ -110,7 +142,14 @@ int16_t sensirion_i2c_read_words_as_bytes(uint8_t address, uint8_t* data,
 
     return NO_ERROR;
 }
-
+/**
+ * @brief Read 16-bit words from the I2C interface.
+ *
+ * @param address I2C device address.
+ * @param data_words Pointer to the array where the read words will be stored.
+ * @param num_words Number of 16-bit words to read.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_read_words(uint8_t address, uint16_t* data_words,
                                  uint16_t num_words) {
     int16_t ret;
@@ -128,14 +167,28 @@ int16_t sensirion_i2c_read_words(uint8_t address, uint16_t* data_words,
 
     return NO_ERROR;
 }
-
+/**
+ * @brief Write a command to the I2C interface.
+ *
+ * @param address I2C device address.
+ * @param command Command code.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_write_cmd(uint8_t address, uint16_t command) {
     uint8_t buf[SENSIRION_COMMAND_SIZE];
 
     sensirion_i2c_fill_cmd_send_buf(buf, command, NULL, 0);
     return sensirion_i2c_hal_write(address, buf, SENSIRION_COMMAND_SIZE);
 }
-
+/**
+ * @brief Write a command with arguments to the I2C interface.
+ *
+ * @param address I2C device address.
+ * @param command Command code.
+ * @param data_words Pointer to the array of argument words.
+ * @param num_words Number of argument words.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_write_cmd_with_args(uint8_t address, uint16_t command,
                                           const uint16_t* data_words,
                                           uint16_t num_words) {
@@ -146,7 +199,16 @@ int16_t sensirion_i2c_write_cmd_with_args(uint8_t address, uint16_t command,
         sensirion_i2c_fill_cmd_send_buf(buf, command, data_words, num_words);
     return sensirion_i2c_hal_write(address, buf, buf_size);
 }
-
+/**
+ * @brief Perform a delayed read command on the I2C interface.
+ *
+ * @param address I2C device address.
+ * @param cmd Command code.
+ * @param delay_us Delay in microseconds before reading data.
+ * @param data_words Pointer to the array where the read words will be stored.
+ * @param num_words Number of 16-bit words to read.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_delayed_read_cmd(uint8_t address, uint16_t cmd,
                                        uint32_t delay_us, uint16_t* data_words,
                                        uint16_t num_words) {
@@ -163,20 +225,42 @@ int16_t sensirion_i2c_delayed_read_cmd(uint8_t address, uint16_t cmd,
 
     return sensirion_i2c_read_words(address, data_words, num_words);
 }
-
+/**
+ * @brief Read a command response from the I2C interface.
+ *
+ * @param address I2C device address.
+ * @param cmd Command code.
+ * @param data_words Pointer to the array where the read words will be stored.
+ * @param num_words Number of 16-bit words to read.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_read_cmd(uint8_t address, uint16_t cmd,
                                uint16_t* data_words, uint16_t num_words) {
     return sensirion_i2c_delayed_read_cmd(address, cmd, 0, data_words,
                                           num_words);
 }
-
+/**
+ * @brief Add a command to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the command.
+ * @param command Command code.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_command_to_buffer(uint8_t* buffer, uint16_t offset,
                                              uint16_t command) {
     buffer[offset++] = (uint8_t)((command & 0xFF00) >> 8);
     buffer[offset++] = (uint8_t)((command & 0x00FF) >> 0);
     return offset;
 }
-
+/**
+ * @brief Add a 32-bit unsigned integer to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the data.
+ * @param data 32-bit unsigned integer.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_uint32_t_to_buffer(uint8_t* buffer, uint16_t offset,
                                               uint32_t data) {
     buffer[offset++] = (uint8_t)((data & 0xFF000000) >> 24);
@@ -192,12 +276,26 @@ uint16_t sensirion_i2c_add_uint32_t_to_buffer(uint8_t* buffer, uint16_t offset,
 
     return offset;
 }
-
+/**
+ * @brief Add a 32-bit signed integer to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the data.
+ * @param data 32-bit signed integer.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_int32_t_to_buffer(uint8_t* buffer, uint16_t offset,
                                              int32_t data) {
     return sensirion_i2c_add_uint32_t_to_buffer(buffer, offset, (uint32_t)data);
 }
-
+/**
+ * @brief Add a 16-bit unsigned integer to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the data.
+ * @param data 16-bit unsigned integer.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_uint16_t_to_buffer(uint8_t* buffer, uint16_t offset,
                                               uint16_t data) {
     buffer[offset++] = (uint8_t)((data & 0xFF00) >> 8);
@@ -208,12 +306,26 @@ uint16_t sensirion_i2c_add_uint16_t_to_buffer(uint8_t* buffer, uint16_t offset,
 
     return offset;
 }
-
+/**
+ * @brief Add a 16-bit signed integer to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the data.
+ * @param data 16-bit signed integer.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_int16_t_to_buffer(uint8_t* buffer, uint16_t offset,
                                              int16_t data) {
     return sensirion_i2c_add_uint16_t_to_buffer(buffer, offset, (uint16_t)data);
 }
-
+/**
+ * @brief Add a float to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the data.
+ * @param data Floating-point value.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_float_to_buffer(uint8_t* buffer, uint16_t offset,
                                            float data) {
     union {
@@ -236,7 +348,15 @@ uint16_t sensirion_i2c_add_float_to_buffer(uint8_t* buffer, uint16_t offset,
 
     return offset;
 }
-
+/**
+ * @brief Add an array of bytes to the buffer.
+ *
+ * @param buffer Pointer to the buffer.
+ * @param offset Offset in the buffer to add the data.
+ * @param data Pointer to the array of bytes.
+ * @param data_length Number of bytes in the array.
+ * @return Updated offset in the buffer.
+ */
 uint16_t sensirion_i2c_add_bytes_to_buffer(uint8_t* buffer, uint16_t offset,
                                            uint8_t* data,
                                            uint16_t data_length) {
@@ -257,12 +377,26 @@ uint16_t sensirion_i2c_add_bytes_to_buffer(uint8_t* buffer, uint16_t offset,
 
     return offset;
 }
-
+/**
+ * @brief Write data to an I2C device.
+ *
+ * @param address I2C device address.
+ * @param data Pointer to the data array.
+ * @param data_length Number of bytes in the data array.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_write_data(uint8_t address, const uint8_t* data,
                                  uint16_t data_length) {
     return sensirion_i2c_hal_write(address, data, data_length);
 }
-
+/**
+ * @brief Read data from an I2C device in place.
+ *
+ * @param address I2C device address.
+ * @param buffer Pointer to the buffer where the read data will be stored.
+ * @param expected_data_length Expected number of bytes to read.
+ * @return Error code.
+ */
 int16_t sensirion_i2c_read_data_inplace(uint8_t address, uint8_t* buffer,
                                         uint16_t expected_data_length) {
     int16_t error;

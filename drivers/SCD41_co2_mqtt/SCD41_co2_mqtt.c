@@ -51,6 +51,10 @@ static char MQTT_SUB_TOPICS[MQTT_TOTAL_SUB_TOPICS][MQTT_BUFF_SIZE] = {MQTT_CLIEN
 static char MQTT_PUB_TOPICS[MQTT_TOTAL_PUB_TOPICS][MQTT_BUFF_SIZE] = {MQTT_CLIENT_ID};
 
 #pragma region MQTT incoming data functions
+/**
+ * @brief Callback function for processing incoming MQTT messages.
+ * Prints the received topic and payload.
+ */
 static void process_incoming_message()
 {
     printf("New MQTT message received!\n");
@@ -67,6 +71,10 @@ static void process_incoming_message()
 // The second function will then be called only if the payload is not empty.
 // This function will be called multiple times until the entire payload is received.
 //
+/**
+ * @brief Callback function for MQTT notifications.
+ * Handles the incoming topic and sets up the payload buffers.
+ */
 static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
 {
     DEBUG_printf("Incoming topic: '%s', total length: %u\n", topic, (unsigned int)tot_len);
@@ -98,6 +106,10 @@ static void mqtt_notify(void *arg, const char *topic, u32_t tot_len)
     }
 }
 
+/**
+ * @brief Callback function for reading MQTT payload.
+ * Appends payload data to the buffer and processes the message when complete.
+ */
 static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags)
 {
     if (payload_total_len > 0)
@@ -115,6 +127,9 @@ static void mqtt_read_payload(void *arg, const u8_t *data, u16_t len, u8_t flags
     }
 }
 
+/**
+ * @brief Subscribes to all predefined MQTT topics.
+ */
 static void mqtt_subscribe_to_all_topics()
 {
     for (int i = 0; i < MQTT_TOTAL_SUB_TOPICS; i++)
@@ -127,6 +142,10 @@ static void mqtt_subscribe_to_all_topics()
 
 #pragma region MQTT publish section
 
+/**
+ * @brief Publishes sensor data to MQTT in JSON format.
+ * Constructs the JSON message and publishes it to the specified topic.
+ */
 static void publishSensorDataFormatToJson(const char *sensorName, char *valueNames[], char *sensorValues[], size_t numValues)
 {
     char topic[MQTT_BUFF_SIZE];
@@ -168,6 +187,10 @@ static void publishSensorDataFormatToJson(const char *sensorName, char *valueNam
     printf("Published to topic: %s, message: %s\n", topic, jsonMessage);
 }
 
+/**
+ * @brief Publishes sensor data to MQTT.
+ * Publishes the provided JSON string to the specified topic.
+ */
 static void publishSensorData(const char *sensorName, const char *JsonString)
 {
     char topic[MQTT_BUFF_SIZE];
@@ -182,6 +205,10 @@ static void publishSensorData(const char *sensorName, const char *JsonString)
     printf("Published to topic: %s, message: %s\n", topic, JsonString);
 }
 #pragma endregion
+/**
+ * @brief Prints the IPv4 address.
+ * Extracts and prints individual octets from the provided address.
+ */
 static void printIPv4Address(unsigned int addr)
 {
     // Extracting individual octets
@@ -197,6 +224,11 @@ static void printIPv4Address(unsigned int addr)
 #pragma endregion
 
 #pragma endregion
+/**
+ * @brief Handles MQTT reconnection.
+ * Attempts to reconnect to the MQTT server in case of a failure.
+ * Publishes the online status and subscribes to all topics upon successful reconnection.
+ */
 void mqtt_reconnect()
 {
     while (mqtt_begin_connection() != ERR_OK)
@@ -213,6 +245,11 @@ void mqtt_reconnect()
     mqtt_subscribe_to_all_topics();
 }
 // Function to read spectral data for sensors 1 to 8 and publish to MQTT, based on timer
+/**
+ * @brief Reads sensor data and publishes it to MQTT.
+ * Checks if the sensor data is ready, reads the data, and publishes it to MQTT.
+ * Handles MQTT reconnection if necessary.
+ */
 void readSensorDataAndPublish()
 {
     bool data_ready_flag = false;
@@ -256,6 +293,10 @@ void readSensorDataAndPublish()
     }
 }
 
+/**
+ * @brief Main function.
+ * Initializes the sensor, Wi-Fi, and MQTT. Enters the main loop for sensor reading and MQTT communication.
+ */
 int main()
 {
     int16_t error = 0;
