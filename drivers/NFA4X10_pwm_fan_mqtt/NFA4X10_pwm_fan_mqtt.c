@@ -54,9 +54,8 @@ static int fan_speed_override = -1;
 static char MQTT_SUB_TOPICS[MQTT_TOTAL_SUB_TOPICS][MQTT_BUFF_SIZE] = {
     MQTT_CLIENT_ID "/CMD",
     MQTT_CLIENT_ID "/DUTYCYCLE_OVERRIDE", // To override fan speed...
-    MQTT_CLIENT_ID "/lightStatus", // Override light status
-    "INF2004_T09/inf2004_zh/AS7341/visibleLight"
-};
+    MQTT_CLIENT_ID "/lightStatus",        // Override light status
+    "INF2004_T09/inf2004_zh/AS7341/visibleLight"};
 
 #pragma region MQTT incoming data functions
 
@@ -71,7 +70,7 @@ static void process_incoming_message()
 
     // NOTE: Sometimes there is a bug where the topic's title comes with a random character 't',
     // this is a 'hack' to just remove the 't' character if it comes with it ....
-    const char *targetTopic = "INF2004_T09/inf2004_ty/DUTYCYCLE_OVERRIDEt";
+    const char *targetTopic = MQTT_CLIENT_ID "/DUTYCYCLE_OVERRIDEt ";
     if (strcmp(topic_buffer, targetTopic) == 0)
     {
         size_t length = strlen(topic_buffer);
@@ -102,13 +101,13 @@ static void process_incoming_message()
             {
                 printf("Turning on light\n");
                 set_all_external_leds_rgb(255, 255, 255);
-                show_external_led();
+                show_external_leds();
             }
             else if (strcmp(payload_buffer, "OFF") == 0)
             {
                 printf("Turning off light\n");
                 set_all_external_leds_rgb(0, 0, 0);
-                show_external_led();
+                show_external_leds();
             }
             else
             {
@@ -116,7 +115,7 @@ static void process_incoming_message()
             }
 
             set_all_external_leds_rgb(255, 255, 255);
-            show_external_led();
+            show_external_leds();
         }
     }
     else if (strcmp(topic_buffer, MQTT_SUB_TOPICS[3]) == 0)
@@ -125,12 +124,12 @@ static void process_incoming_message()
         if (ambientLightLevel < 500)
         {
             set_all_external_leds_rgb(255, 255, 255);
-            show_external_led();
+            show_external_leds();
         }
         else
         {
             set_all_external_leds_rgb(0, 0, 0);
-            show_external_led();
+            show_external_leds();
         }
     }
     else
@@ -349,7 +348,6 @@ void mqtt_reconnect()
     // subscribe to all topics
     mqtt_subscribe_to_all_topics();
 }
-
 
 /**
  * @brief Reads spectral data for sensors 1 to 8 and publishes it to MQTT based on a timer.
