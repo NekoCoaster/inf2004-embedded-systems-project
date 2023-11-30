@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
@@ -10,6 +9,7 @@
 
 #define DEFAULT_DUTY_CYCLE 100
 
+// NOTE: Use tacho count measure rotational speed of fan...
 volatile uint32_t tacho_count = 0;
 volatile float last_fan_speed = 0;
 
