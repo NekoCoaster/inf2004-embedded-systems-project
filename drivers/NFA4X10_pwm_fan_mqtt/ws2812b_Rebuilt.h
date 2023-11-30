@@ -1,10 +1,8 @@
-//  Original WS2812B LED code by yeahimthatguy @ https://forums.raspberrypi.com/viewtopic.php?t=322218
-//  Adapted into standalone library to support both the MakerPico's onboard WS2812B LED and 1 additional external WS2812B LED strip.
-
-// DISCLAIMER: The original code was written by yeahimthatguy as a quick and simple way to control WS2812B LEDs using the RP2040's PIO.
-// I've simply adapted the code to be used as a standalone library to support both the MakerPico's onboard WS2812B LED and 1 additional external WS2812B LED strip.
-//
-//
+/** @file ws2812b_Rebuilt.h
+ * Original WS2812B LED code by yeahimthatguy @ https://forums.raspberrypi.com/viewtopic.php?t=322218
+ * Adapted into standalone library to support both the MakerPico's onboard WS2812B LED and 1 additional external WS2812B LED strip.
+ *
+ */
 #ifndef WS2812B_REBUILT_H
 #define WS2812B_REBUILT_H
 

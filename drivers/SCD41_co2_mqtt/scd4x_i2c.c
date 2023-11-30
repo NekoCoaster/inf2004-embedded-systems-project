@@ -43,6 +43,10 @@
 
 #define SCD4X_I2C_ADDRESS 98
 
+/**
+ * @brief Starts periodic measurement.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_start_periodic_measurement() {
     int16_t error;
     uint8_t buffer[2];
@@ -57,6 +61,13 @@ int16_t scd4x_start_periodic_measurement() {
     return NO_ERROR;
 }
 
+/**
+ * @brief Reads measurement ticks for CO2, temperature, and humidity.
+ * @param[out] co2 - Pointer to store CO2 measurement.
+ * @param[out] temperature - Pointer to store temperature measurement.
+ * @param[out] humidity - Pointer to store humidity measurement.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_read_measurement_ticks(uint16_t* co2, uint16_t* temperature,
                                      uint16_t* humidity) {
     int16_t error;
@@ -81,6 +92,13 @@ int16_t scd4x_read_measurement_ticks(uint16_t* co2, uint16_t* temperature,
     return NO_ERROR;
 }
 
+/**
+ * @brief Reads measurement values for CO2, temperature, and humidity.
+ * @param[out] co2 - Pointer to store CO2 measurement.
+ * @param[out] temperature_m_deg_c - Pointer to store temperature measurement in mDegC.
+ * @param[out] humidity_m_percent_rh - Pointer to store humidity measurement in mPercentRH.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_read_measurement(uint16_t* co2, int32_t* temperature_m_deg_c,
                                int32_t* humidity_m_percent_rh) {
     int16_t error;
@@ -96,6 +114,10 @@ int16_t scd4x_read_measurement(uint16_t* co2, int32_t* temperature_m_deg_c,
     return NO_ERROR;
 }
 
+/**
+ * @brief Stops periodic measurement.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_stop_periodic_measurement() {
     int16_t error;
     uint8_t buffer[2];
@@ -110,6 +132,11 @@ int16_t scd4x_stop_periodic_measurement() {
     return NO_ERROR;
 }
 
+/**
+ * @brief Gets temperature offset in ticks.
+ * @param[out] t_offset - Pointer to store temperature offset in ticks.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_get_temperature_offset_ticks(uint16_t* t_offset) {
     int16_t error;
     uint8_t buffer[3];
@@ -131,6 +158,11 @@ int16_t scd4x_get_temperature_offset_ticks(uint16_t* t_offset) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Gets temperature offset in mDegC.
+ * @param[out] t_offset_m_deg_c - Pointer to store temperature offset in mDegC.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_get_temperature_offset(int32_t* t_offset_m_deg_c) {
     int16_t error;
     uint16_t t_offset;
@@ -143,6 +175,11 @@ int16_t scd4x_get_temperature_offset(int32_t* t_offset_m_deg_c) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Sets temperature offset in ticks.
+ * @param t_offset - Temperature offset in ticks.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_set_temperature_offset_ticks(uint16_t t_offset) {
     int16_t error;
     uint8_t buffer[5];
@@ -159,11 +196,21 @@ int16_t scd4x_set_temperature_offset_ticks(uint16_t t_offset) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Sets temperature offset in mDegC.
+ * @param t_offset_m_deg_c - Temperature offset in mDegC.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_set_temperature_offset(int32_t t_offset_m_deg_c) {
     uint16_t t_offset = (uint16_t)((t_offset_m_deg_c * 12271) >> 15);
     return scd4x_set_temperature_offset_ticks(t_offset);
 }
 
+/**
+ * @brief Gets sensor altitude.
+ * @param[out] sensor_altitude - Pointer to store sensor altitude.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_get_sensor_altitude(uint16_t* sensor_altitude) {
     int16_t error;
     uint8_t buffer[3];
@@ -185,6 +232,11 @@ int16_t scd4x_get_sensor_altitude(uint16_t* sensor_altitude) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Sets sensor altitude.
+ * @param sensor_altitude - Sensor altitude value.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_set_sensor_altitude(uint16_t sensor_altitude) {
     int16_t error;
     uint8_t buffer[5];
@@ -202,6 +254,11 @@ int16_t scd4x_set_sensor_altitude(uint16_t sensor_altitude) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Sets ambient pressure.
+ * @param ambient_pressure - Ambient pressure value.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_set_ambient_pressure(uint16_t ambient_pressure) {
     int16_t error;
     uint8_t buffer[5];
@@ -219,6 +276,12 @@ int16_t scd4x_set_ambient_pressure(uint16_t ambient_pressure) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Performs forced recalibration.
+ * @param target_co2_concentration - Target CO2 concentration for recalibration.
+ * @param[out] frc_correction - Pointer to store forced recalibration correction.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_perform_forced_recalibration(uint16_t target_co2_concentration,
                                            uint16_t* frc_correction) {
     int16_t error;
@@ -244,6 +307,11 @@ int16_t scd4x_perform_forced_recalibration(uint16_t target_co2_concentration,
     return NO_ERROR;
 }
 
+/**
+ * @brief Gets automatic self-calibration status.
+ * @param[out] asc_enabled - Pointer to store automatic self-calibration status.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_get_automatic_self_calibration(uint16_t* asc_enabled) {
     int16_t error;
     uint8_t buffer[3];
@@ -265,6 +333,11 @@ int16_t scd4x_get_automatic_self_calibration(uint16_t* asc_enabled) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Sets automatic self-calibration status.
+ * @param asc_enabled - Automatic self-calibration status.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_set_automatic_self_calibration(uint16_t asc_enabled) {
     int16_t error;
     uint8_t buffer[5];
@@ -282,6 +355,10 @@ int16_t scd4x_set_automatic_self_calibration(uint16_t asc_enabled) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Starts low-power periodic measurement.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_start_low_power_periodic_measurement() {
     uint8_t buffer[2];
     uint16_t offset = 0;
@@ -290,6 +367,11 @@ int16_t scd4x_start_low_power_periodic_measurement() {
     return sensirion_i2c_write_data(SCD4X_I2C_ADDRESS, &buffer[0], offset);
 }
 
+/**
+ * @brief Gets data ready flag.
+ * @param[out] data_ready_flag - Pointer to store data ready flag.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_get_data_ready_flag(bool* data_ready_flag) {
     int16_t error;
     uint8_t buffer[3];
@@ -313,6 +395,10 @@ int16_t scd4x_get_data_ready_flag(bool* data_ready_flag) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Persists settings.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_persist_settings() {
     int16_t error;
     uint8_t buffer[2];
@@ -327,6 +413,13 @@ int16_t scd4x_persist_settings() {
     return NO_ERROR;
 }
 
+/**
+ * @brief Gets serial number.
+ * @param[out] serial_0 - Pointer to store first part of the serial number.
+ * @param[out] serial_1 - Pointer to store second part of the serial number.
+ * @param[out] serial_2 - Pointer to store third part of the serial number.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_get_serial_number(uint16_t* serial_0, uint16_t* serial_1,
                                 uint16_t* serial_2) {
     int16_t error;
@@ -351,6 +444,11 @@ int16_t scd4x_get_serial_number(uint16_t* serial_0, uint16_t* serial_1,
     return NO_ERROR;
 }
 
+/**
+ * @brief Performs self-test.
+ * @param[out] sensor_status - Pointer to store sensor status after self-test.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_perform_self_test(uint16_t* sensor_status) {
     int16_t error;
     uint8_t buffer[3];
@@ -372,6 +470,10 @@ int16_t scd4x_perform_self_test(uint16_t* sensor_status) {
     return NO_ERROR;
 }
 
+/**
+ * @brief Performs factory reset.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_perform_factory_reset() {
     int16_t error;
     uint8_t buffer[2];
@@ -386,6 +488,10 @@ int16_t scd4x_perform_factory_reset() {
     return NO_ERROR;
 }
 
+/**
+ * @brief Reinitializes the sensor.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_reinit() {
     int16_t error;
     uint8_t buffer[2];
@@ -400,6 +506,10 @@ int16_t scd4x_reinit() {
     return NO_ERROR;
 }
 
+/**
+ * @brief Measures CO2, temperature, and humidity in a single shot.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_measure_single_shot() {
     int16_t error;
     uint8_t buffer[2];
@@ -414,6 +524,10 @@ int16_t scd4x_measure_single_shot() {
     return NO_ERROR;
 }
 
+/**
+ * @brief Measures relative humidity and temperature in a single shot.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_measure_single_shot_rht_only() {
     int16_t error;
     uint8_t buffer[2];
@@ -427,7 +541,10 @@ int16_t scd4x_measure_single_shot_rht_only() {
     sensirion_i2c_hal_sleep_usec(50000);
     return NO_ERROR;
 }
-
+/**
+ * @brief Powers down the sensor.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_power_down() {
     int16_t error;
     uint8_t buffer[2];
@@ -441,7 +558,10 @@ int16_t scd4x_power_down() {
     sensirion_i2c_hal_sleep_usec(1000);
     return NO_ERROR;
 }
-
+/**
+ * @brief Wakes up the sensor.
+ * @return int16_t - Error code.
+ */
 int16_t scd4x_wake_up() {
     uint8_t buffer[2];
     uint16_t offset = 0;
