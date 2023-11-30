@@ -14,10 +14,10 @@ Here in this folder, contains all the nessasary documentation on how we plan to 
 
 ## 4-pin PWM Fan Header Pinout and wiring proposal.
 
-Based on the [**PWM specification paper**](/docs/5v-pwm-fan/Noctua_PWM_specifications_white_paper.pdf)
+Based on the [**PWM specification paper**](/docs/5v_pwm_fan/Noctua_PWM_specifications_white_paper.pdf)
 published by Noctua, the 4-pin PWM fan header pinout is as follows:
 <br/>
-![Alt text](/docs/5v-pwm-fan/img/4-pin-header.png)
+![Alt text](/docs/5v_pwm_fan/4-pin-header.png)
 
 ## Factors to consider when driving the PWM signal:
 
@@ -25,14 +25,14 @@ published by Noctua, the 4-pin PWM fan header pinout is as follows:
 - 🟡 For the PWM signal to be considered as a logic low, the voltage should be below 0.8V. Which means that the Raspberry Pi Pico's 3.3V output should be sufficient enough to drive the PWM signal. A user forum post here also confirms that they are able to drive a 5V PWM fan directly, using a Raspberry Pi Pico's GPIO pin: https://forums.raspberrypi.com/viewtopic.php?t=310374
 - 🔴 Since the Raspberry Pi Pico's GPIO pins are capable of supplying up to 16mA of current, we will need to use at least a 660 ohm resistor to bring down the GPIO's current from 16mA to 5mA as specified. Even safer would be to use a 1k ohm resistor to bring down the current to 3.3mA. So as to ensure that the fan's PWM input is not damaged.
 
-![Alt text](/docs/5v-pwm-fan/img/pdf-pwm-specs.png)
+![Alt text](/docs/5v_pwm_fan/pdf-pwm-specs.png)
 
 ## Wiring Diagram
 
 For our use case, we will be assuming that the whole system will be running off of a 5V, USB-A breakout. This will allow us to easily power both the Raspberry Pi Pico and the fan from a single power source. </br>
 ⚠️**Important Note:** The Raspberry Pi Pico and the Fan's GND pins needs to be connected together. This is to ensure that the PWM signal is referenced to the same ground. </br>
 </br>
-![Wiring Diagram](/docs/5v-pwm-fan/img/conn-diagram.jpg)
+![Wiring Diagram](/docs/5v_pwm_fan/conn-diagram.jpg)
 
 ### Connecting PWM signal pin
 
